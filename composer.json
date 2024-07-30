@@ -1,0 +1,40 @@
+{
+    "name": "mallardduck/scryfall-bulk-sdk",
+    "description": "A php library that will help you work with the Scryfall bulkdata set.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mallardduck\\ScryfallBulkSdk\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mallardduck\\ScryfallBulkSdk\\Test\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MallardDuck",
+            "email": "self@danpock.me"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.34",
+        "symfony/var-dumper": "^7.1",
+        "phpstan/phpstan": "1.11.6",
+        "pestphp/pest-plugin-type-coverage": "^2.8"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
