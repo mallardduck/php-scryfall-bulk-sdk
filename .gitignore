@@ -5,6 +5,9 @@
 /vendor
 /nbproject
 /tests/composer-test.phar
+blobs/*
+!blobs/.gitkeep
+debug.php
 .phpunit.result.cache
 .vagrant
 Vagrantfile
