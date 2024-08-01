@@ -4,9 +4,12 @@
 /composer.phar
 /vendor
 /nbproject
+build/*
+!build/.gitkeep
 /tests/composer-test.phar
 blobs/*
 !blobs/.gitkeep
+phpunit.xml
 debug.php
 .phpunit.result.cache
 .vagrant

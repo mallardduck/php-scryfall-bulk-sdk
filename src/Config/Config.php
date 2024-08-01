@@ -6,12 +6,14 @@ use Mallardduck\ScryfallBulkSdk\BulkFileType;
 
 final class Config
 {
-    protected Env $env;
+    const BULK_FILE_PATH_KEY = 'bulk_file_path';
+    const BULK_FILE_TYPE_KEY = 'bulk_file_type';
+    const USER_AGENT_KEY = 'user_agent';
+
     protected array $config = [];
 
-    public function __construct($envFilePath = null)
+    protected function __construct()
     {
-        $this->env = Env::getInstance();
         $this->loadConfig();
     }
 
@@ -20,13 +22,36 @@ final class Config
         // Load all the needed configs via ENV or set defaults...
         $this->config = [
             # TODO: find sane values...
-            'bulkFilePath' => $this->env->get('SBS_BULK_FILE_PATH', (new DefaultBulkPathSelector)()),
-            'bulkFileType' => $this->env->get('SBS_BULK_FILE_TYPE', BulkFileType::OracleCards),
+            self::BULK_FILE_PATH_KEY => Env::get('SBS_BULK_FILE_PATH', null),
+            self::BULK_FILE_TYPE_KEY => Env::get('SBS_BULK_FILE_TYPE', BulkFileType::OracleCards->value),
+            self::USER_AGENT_KEY => Env::get('SBS_USER_AGENT', "PHP Scryfall Bulk SDK"),
         ];
     }
 
     public function get($key, $default = null)
     {
         return $this->config[$key] ?? $default;
+    }
+
+    protected static ?self $instance =  null;
+
+    private function __clone() {}
+    public function __wakeup()
+    {
+        throw new \Exception("Cannot unserialize a singleton.");
+    }
+
+    final public static function getInstance(): Config
+    {
+        $calledClass = get_called_class();
+        if (Config::$instance === null) {
+            Config::$instance = new Config;
+        }
+        return Config::$instance;
+    }
+
+    final public static function clearInstance(): void
+    {
+        Config::$instance = null;
     }
 }

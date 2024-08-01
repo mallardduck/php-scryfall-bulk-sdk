@@ -19,24 +19,6 @@ use RuntimeException;
  */
 final class Env
 {
-    private static ?Env $instance = null;
-    protected function __construct() { }
-    protected function __clone() { }
-    public function __wakeup()
-    {
-        throw new \Exception("Cannot unserialize a singleton.");
-    }
-
-    public static function getInstance(): Env
-    {
-        $cls = Env::class;
-        if (!isset(self::$instance)) {
-            self::$instance = new Env();
-        }
-
-        return self::$instance;
-    }
-
     /**
      * Indicates if the putenv adapter is enabled.
      *

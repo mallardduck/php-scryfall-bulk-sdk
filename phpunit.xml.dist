@@ -14,4 +14,11 @@
             <directory suffix=".php">./src</directory>
         </include>
     </source>
+    <coverage includeUncoveredFiles="true">
+        <report>
+            <clover outputFile="build/clover.xml"/>
+            <html outputDirectory="build/coverage" lowUpperBound="40" highLowerBound="74"/>
+            <text outputFile="build/coverage.txt"/>
+        </report>
+    </coverage>
 </phpunit>
