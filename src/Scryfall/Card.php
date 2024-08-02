@@ -19,7 +19,7 @@ final class Card
      * @param null|string[] $artist_ids
      */
     public function __construct(
-        public readonly null|string $arena_id,
+        public readonly null|int $arena_id,
         public readonly string $id, // Could be upgraded to UUID type?
         public readonly string $lang,
         public readonly null|int $mtgo_id,
@@ -37,7 +37,7 @@ final class Card
         public readonly string $uri,
         public readonly null|array $all_parts,
         public readonly null|array $card_faces,
-        public readonly int|float $cmc,
+        public readonly null|int|float $cmc,
         public readonly array $color_identity,
         public readonly null|array $color_indicator,
         public readonly null|array $colors,
@@ -62,8 +62,8 @@ final class Card
         public readonly null|array $attraction_lights,
         public readonly bool $booster,
         public readonly string $border_color,
-        public readonly string $card_back_id, // Could be upgraded to UUID type?
-        public readonly string $collector_number,
+        public readonly null|string $card_back_id, // Could be upgraded to UUID type? // SCRYFALL BUG: they didn't mark this shit nullable
+        public readonly null|string $collector_number,
         public readonly null|bool $content_warning,
         // public readonly bool $digital,
         public readonly array $finishes,

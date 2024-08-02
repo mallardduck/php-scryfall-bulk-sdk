@@ -3,9 +3,12 @@
 namespace Mallardduck\ScryfallBulkSdk\Downloader;
 
 use JsonMachine\Items;
-use JsonMachine\JsonDecoder\PassThruDecoder;
 use Mallardduck\ScryfallBulkSdk\BulkFileType;
+use Mallardduck\ScryfallBulkSdk\Scryfall\Card;
 use PDO;
+use PDOException;
+use ReflectionClass;
+use ReflectionProperty;
 
 class JsonToSqliteStreamer
 {
@@ -31,42 +34,23 @@ class JsonToSqliteStreamer
 
     public function __invoke()
     {
-        $sampleData = $this->getSampleData();
-        $columns = $this->determineSchema($sampleData);
+        $columns = $this->determineSchema();
         $this->createTable($columns);
         $this->insertData($columns);
     }
 
-    private function getSampleData(): array
-    {
-        $sample = [];
-        $iterator = Items::fromFile($this->jsonFilePath);
-        foreach ($iterator as $key => $value) {
-            $sample[] = $value;
-            if (count($sample) >= 10) {
-                break;
-            }
-        }
-        return $sample;
-    }
-
-    private function determineSchema(array $sampleData): array
+    private function determineSchema(): array
     {
         $columns = [];
-        foreach ($sampleData as $row) {
-            foreach ($row as $key => $value) {
-                if (!isset($columns[$key])) {
-                    $columns[$key] = $this->guessType($value);
-                } else {
-                    // Ensure we handle mixed types
-                    $existingType = $columns[$key];
-                    $newType = $this->guessType($value);
-                    if ($existingType !== $newType) {
-                        $columns[$key] = 'TEXT NULL';
-                    }
-                }
+        // TODO: rebuild this based on Reflection and using the new Card class.
+        $cardReflection = new ReflectionClass(Card::class);
+        foreach ($cardReflection->getProperties() as $property) {
+            if ($property->isPublic()) {
+                // Don't need to guess type, we now can infer it based on the PHP property type...
+                $columns[$property->getName()] = $this->inferType($property);
             }
         }
+
         return $columns;
     }
 
@@ -99,7 +83,12 @@ class JsonToSqliteStreamer
                 $values[] = $value ?? null;
                 unset($value);
             }
-            $stmt->execute($values);
+            try {
+                $stmt->execute($values);
+            } catch (PDOException $e) {
+                var_dump($row->name, $row->scryfall_uri);
+                throw $e;
+            }
             $values = null;
             $count++;
 
@@ -110,30 +99,48 @@ class JsonToSqliteStreamer
         }
     }
 
-    private function guessType($value): string
-    {
-        if (is_int($value)) {
-            return 'INTEGER';
-        } elseif (is_float($value)) {
-            return 'REAL';
-        } elseif (is_bool($value)) {
-            return 'INTEGER'; // SQLite does not have a boolean type
-        } elseif (is_null($value)) {
-            return 'TEXT NULL';
-        } elseif (is_string($value)) {
-            // Try to parse the string as an integer
-            if (ctype_digit($value) && filter_var($value, FILTER_VALIDATE_INT) !== false) {
-                return 'INTEGER';
-            }
 
-            // Try to parse the string as a float
-            if (is_numeric($value) && str_contains($value, '.') && filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
-                return 'REAL';
+    private function inferType(ReflectionProperty $property): string
+    {
+        $typeCollector = function (array &$sink, \ReflectionNamedType $type) {
+            $sink[] = $type->getName();
+            if ($type->allowsNull()) {
+                $sink[] = null;
             }
+        };
+
+        // Collection all the column/property types into a single array...
+        $types = [];
+        $reflectionType = $property->getType();
+        if ($reflectionType instanceof \ReflectionUnionType) {
+            $unionTypes = $reflectionType->getTypes();
+            foreach ($unionTypes as $type) {
+                $typeCollector($types, $type);
+            }
+        } else {
+            $typeCollector($types, $reflectionType);
         }
 
-        // If the string doesn't fit any of the above cases, treat it as TEXT
-        return 'TEXT';
+        // Determine the type based on types...
+        $sqliteType = "TEXT";
+        if (in_array("float", $types) && in_array("int", $types)) {
+            // Do nothing
+            usleep(1);
+        } elseif (in_array("float", $types)) {
+            $sqliteType = "REAL";
+        } elseif (in_array("int", $types)) {
+            $sqliteType = "INTEGER";
+        } elseif (in_array("bool", $types)) {
+            $sqliteType = "BOOLEAN";
+        }
+
+        if (in_array(null, $types, true)) {
+            $sqliteType .= " NULL";
+        } else {
+            $sqliteType .= " NOT NULL";
+        }
+
+        return $sqliteType;
     }
 
     private function createTable(array $columns)
