@@ -12,7 +12,15 @@ use Mallardduck\ScryfallBulkSdk\Config\DefaultBulkPathSelector;
 class BulkFileFetcher
 {
     const SCRYFALL_BULK_URL = "https://api.scryfall.com/bulk-data";
-    public function __invoke()
+
+    /**
+     * @return false Returns based on if it fetched a file, not success. Only failure is an exception.
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Spatie\TemporaryDirectory\Exceptions\PathAlreadyExists
+     * @throws \Throwable
+     */
+    public function __invoke(): bool
     {
         $config = Config::getInstance();
         $bulkFileType = BulkFileType::from($config->get(Config::BULK_FILE_TYPE_KEY));
@@ -24,12 +32,12 @@ class BulkFileFetcher
             $fileUpdatedAt = Carbon::createFromFormat('YmdHis', $date[1]);
 
             if ($fileUpdatedAt->lessThan(Carbon::now()->subHours(8)) === false) {
-                echo "Will not fetch file until older than 8 hours.";
-                exit(0);
+                echo "Will not fetch file until older than 8 hours." . PHP_EOL;
+                return false;
             }
         }
 
-        echo "The file is missing or outdated, will fetch";
+        echo "The file is missing or outdated, will fetch" . PHP_EOL;
 
         $configBulkFilePath = $config->get(Config::BULK_FILE_PATH_KEY);
         $bulkFilePath = (new DefaultBulkPathSelector)($configBulkFilePath);
@@ -55,5 +63,6 @@ class BulkFileFetcher
         if ($downloadResponse->getStatusCode() !== 200) {
             throw new \RuntimeException($downloadResponse->getBody()->getContents());
         }
+        return true;
     }
 }

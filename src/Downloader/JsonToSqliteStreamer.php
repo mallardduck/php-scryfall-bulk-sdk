@@ -9,21 +9,23 @@ use PDO;
 
 class JsonToSqliteStreamer
 {
-    private string $sqliteFileName;
     private PDO $db;
     private string $tableName;
 
+    public static function sqlitePath(string $basepath, BulkFileType $bulkFileType): string
+    {
+        $sqliteFileName = $bulkFileType->slug() . '.sqlite';
+        return $basepath . DIRECTORY_SEPARATOR . $sqliteFileName;
+    }
+
     public function __construct(
-        private readonly string $basepath,
-        private readonly BulkFileType $bulkFileType,
+        private readonly string $sqliteFilePath,
         private readonly string $jsonFilePath,
     ) {
-        $this->sqliteFileName = $this->bulkFileType->slug() . '.sqlite';
-        $fullDbPath = $this->basepath . DIRECTORY_SEPARATOR . $this->sqliteFileName;
-        if (!file_exists($fullDbPath)) {
-            touch($fullDbPath);
+        if (!file_exists($this->sqliteFilePath)) {
+            touch($this->sqliteFilePath);
         }
-        $this->db = new PDO("sqlite:$fullDbPath");
+        $this->db = new PDO("sqlite:$this->sqliteFilePath");
         $this->tableName = 'cards';
     }
 
