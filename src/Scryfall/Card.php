@@ -7,7 +7,7 @@ use Mallardduck\ScryfallBulkSdk\Scryfall\CardValues\Color;
 
 final class Card
 {
-    public static array $dropFields = [
+    private static array $_dropFields = [
         'digital',
     ];
 
