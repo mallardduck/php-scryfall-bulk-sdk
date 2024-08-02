@@ -37,8 +37,12 @@ final class DefaultBulkPathSelector
         }
 
         // Option 1. Find the composer autoload folder, then the folder where this library is installed use predefined folder,
-        if ($composerVendorFolder = FileHelpers::canDirectoryBeUsed(FileHelpers::composerVendorFolder() . DIRECTORY_SEPARATOR . self::BULK_FILE_FOLDER)) {
-            return $composerVendorFolder;
+        if ($composerVendorFolder = FileHelpers::canDirectoryBeUsed(FileHelpers::composerVendorFolder())) {
+            $bulkVendorFolder = $composerVendorFolder . DIRECTORY_SEPARATOR . self::BULK_FILE_FOLDER;
+            if (!file_exists($bulkVendorFolder)) {
+                mkdir($bulkVendorFolder);
+            }
+            return $bulkVendorFolder;
         }
 
         // Option Last - Use `spatie/temporary-directory` to just grab a system temp-dir.
