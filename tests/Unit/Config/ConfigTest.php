@@ -1,8 +1,7 @@
 <?php
 
 use Mallardduck\ScryfallBulkSdk\BulkFileType;
-use Mallardduck\ScryfallBulkSdk\Config\Config;
-use Mallardduck\ScryfallBulkSdk\Config\DefaultBulkPathSelector;
+use Mallardduck\ScryfallBulkSdk\Config;
 use Mallardduck\ScryfallBulkSdk\Config\Env;
 
 beforeEach(function () {
@@ -65,4 +64,4 @@ it('actually clears singleton instance when called', function () {
 it('throws on clone too', function () {
     $config = Config::getInstance();
     $newConfig = clone $config;
-})->throws(Error::class, 'Call to private Mallardduck\ScryfallBulkSdk\Config\Config::__clone() from scope P\Tests\Unit\Config\ConfigTest');
+})->throws(Error::class, 'Call to private Mallardduck\ScryfallBulkSdk\Config::__clone() from scope P\Tests\Unit\Config\ConfigTest');

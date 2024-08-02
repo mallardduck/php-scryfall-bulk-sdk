@@ -3,7 +3,6 @@
 namespace Mallardduck\ScryfallBulkSdk;
 
 use Exception;
-use Mallardduck\ScryfallBulkSdk\Config\Config;
 use Mallardduck\ScryfallBulkSdk\Config\DefaultBulkPathSelector;
 use PhpOption\None;
 use PhpOption\Option;

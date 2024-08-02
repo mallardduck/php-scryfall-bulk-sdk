@@ -1,8 +1,8 @@
 <?php
 
-namespace Mallardduck\ScryfallBulkSdk\Config;
+namespace Mallardduck\ScryfallBulkSdk;
 
-use Mallardduck\ScryfallBulkSdk\BulkFileType;
+use Mallardduck\ScryfallBulkSdk\Config\Env;
 
 final class Config
 {

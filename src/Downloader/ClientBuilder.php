@@ -3,7 +3,7 @@
 namespace Mallardduck\ScryfallBulkSdk\Downloader;
 
 use GuzzleHttp\Client;
-use Mallardduck\ScryfallBulkSdk\Config\Config;
+use Mallardduck\ScryfallBulkSdk\Config;
 
 class ClientBuilder
 {

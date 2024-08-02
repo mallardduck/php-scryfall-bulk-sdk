@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Psr7\Utils;
 use Mallardduck\ScryfallBulkSdk\BulkFileSource;
 use Mallardduck\ScryfallBulkSdk\BulkFileType;
-use Mallardduck\ScryfallBulkSdk\Config\Config;
+use Mallardduck\ScryfallBulkSdk\Config;
 use Mallardduck\ScryfallBulkSdk\Config\DefaultBulkPathSelector;
 
 class BulkFileFetcher
